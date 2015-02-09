@@ -1,0 +1,3 @@
+#+TITLE Skyline Data-dumping Demonstration
+
+This package is an example of how to feed data to my fork of Etsy's Skyline data-analytics service.
