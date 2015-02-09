@@ -33,6 +33,8 @@ instance Random UTCTime where
                      (rtime, nextGen') = randomR (0, 86400) nextGen
                  in (UTCTime (ModifiedJulianDay rday)  (secondsToDiffTime rtime), nextGen')
 
+randomData name num generator = map mkMetric $ take num $ zip (randoms generator :: [UTCTime]) (randomRs (0, 1000) generator :: [Int])
+        where mkMetric tup = Metric name (fst tup) (snd tup)
 
 sendMetric handle metric = do 
                 BS.hPut handle message
@@ -52,9 +54,6 @@ openHorizonConn hostname port = do
                 h <- socketToHandle sock WriteMode
                 hSetBuffering h (BlockBuffering Nothing) -- Manually flush
                 return h
-
-randomData name num generator = map mkMetric $ take num $ zip (randoms generator :: [UTCTime]) (randomRs (0, 1000) generator :: [Int])
-        where mkMetric tup = Metric name (fst tup) (snd tup)
 
 main = do
     g <- getStdGen
