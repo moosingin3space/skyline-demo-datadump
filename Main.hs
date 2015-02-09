@@ -6,7 +6,6 @@ import GHC.Generics
 import ClassyPrelude hiding (mapM_)
 import Network.Socket hiding (send, sendTo, recv, recvFrom)
 import Network.Socket.ByteString (send, recv)
-import qualified Data.ByteString.Lazy.Char8 as BS
 import Data.Time
 import System.Random
 import System.IO
@@ -37,7 +36,7 @@ randomData name num generator = map mkMetric $ take num $ zip (randoms generator
         where mkMetric tup = Metric name (fst tup) (snd tup)
 
 sendMetric handle metric = do 
-                BS.hPut handle message
+                hPut handle message
                 hFlush handle
         where message = encode metric ++ "\n"
 
