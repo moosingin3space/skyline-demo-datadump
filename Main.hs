@@ -41,10 +41,26 @@ sendMetric handle metric = do
 
 sendMetrics handle metrics = mapM_ (sendMetric handle) metrics
 
+openHorizonConn hostname port = do
+                -- Look up address (allows you to pass DNS names)
+                addrInfos <- getAddrInfo Nothing (Just hostname) (Just port)
+                let serveraddr = unsafeHead addrInfos
+                -- Open socket
+                sock <- socket (addrFamily serveraddr) Stream defaultProtocol
+                connect sock (addrAddress serveraddr)
+                -- Convert to handle
+                h <- socketToHandle sock WriteMode
+                hSetBuffering h (BlockBuffering Nothing) -- Manually flush
+                return h
+
 randomData name num generator = map mkMetric $ take num $ zip (randoms generator :: [UTCTime]) (randomRs (0, 1000) generator :: [Int])
         where mkMetric tup = Metric name (fst tup) (snd tup)
 
 main = do
     g <- getStdGen
-    sendMetrics stdout $ randomData "fun" 10 g
+    handle <- openHorizonConn "localhost" "2026"
+    let d = randomData "fun" 10 g
+    sendMetrics handle d
+    sendMetrics stdout d
+    hClose handle
 
