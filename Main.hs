@@ -57,7 +57,7 @@ openHorizonConn hostname port = do
 main = do
     g <- getStdGen
     handle <- openHorizonConn "localhost" "2026"
-    let d = randomData "fun" 10 g
+    let d = randomData "fun" 2000 g
     sendMetrics handle d
     sendMetrics stdout d
     hClose handle
